@@ -1,0 +1,15 @@
+[Unit]
+Description=dbservice phpMyAdmin
+
+[Service]
+Restart=on-failure
+ExecStartPre=/usr/bin/rm -f %t/%n-pid %t/%n-cid
+ExecStart=/usr/bin/podman run --name dbservice-pma --hostname dbservice-pma --network host --conmon-pidfile /%t/%n-pid --cidfile %t/%n-cid -d -e PMA_HOST=127.0.0.1 -p 8080:80 phpmyadmin/phpmyadmin
+#ExecStart=/usr/bin/podman run --name dbservice-pma --conmon-pidfile /%t/%n-pid --cidfile %t/%n-cid -d -e PMA_HOST=dbservice-mariadb -p 8080:80 phpmyadmin/phpmyadmin
+ExecStop=/usr/bin/sh -c "/usr/bin/podman rm -f `cat %t/%n-cid`"
+KillMode=none
+Type=forking
+PIDFile=%t/%n-pid
+
+[Install]
+WantedBy=multi-user.target
