@@ -1,0 +1,31 @@
+# Inspired by https://www.redhat.com/sysadmin/podman-shareable-systemd-services
+
+[Unit]
+Description={{ description }}
+
+[Service]
+Restart=on-failure
+ExecStartPre=/usr/bin/rm -f %t/%n-pid %t/%n-cid
+ExecStart=/usr/bin/podman run --name {{ container_name }} \
+    --hostname {{ container_name }} \
+    {% if network is defined %}--network {{ network }} \
+    {% endif %}
+    --conmon-pidfile %t/%n-pid \
+    --cidfile %t/%n-cid \
+    -d \
+    {% for var, val in env.items() %} -e {{ var }}={{ val }}{% endfor %} \
+    {% for port in ports %} -p {{ port }}{% endfor %} \
+    {% if healthcheck is defined %}--health-cmd='{{ healthcheck }}' \
+    --health-interval={{ health_interval }} \
+    --health-retries={{ health_retries }} \
+    --health-start-period={{ health_start_period }} \
+    --health-timeout={{ health_timeout }} \
+    {% endif %}
+    {{ image }}
+ExecStop=/usr/bin/sh -c "/usr/bin/podman rm -f `cat %t/%n-cid`"
+KillMode=none
+Type=forking
+PIDFile=%t/%n-pid
+
+[Install]
+WantedBy=multi-user.target

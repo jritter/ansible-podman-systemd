@@ -1,0 +1,7 @@
+---
+# defaults file for podman_systemd_container
+health_interval: 30s
+health_retries: 3
+health_start_period: 0s
+health_timeout: 30s
+ports: []

@@ -1,0 +1,33 @@
+- name: Deploy dbservice
+  hosts: all
+  become: yes
+  tasks:
+    - include_role:
+        name: podman_systemd_container
+      vars:
+        container_name: dbservice-mariadb
+        image: registry.redhat.io/rhel8/mariadb-103
+        description: MariaDB service
+        env:
+          MYSQL_USER: user
+          MYSQL_PASSWORD: pass
+          MYSQL_DATABASE: db
+        ports:
+          - '3306:3306'
+          - '8080:80'
+        volume:
+          - /var/dbservice/db:/var/lib/mysql/data:Z
+        healthcheck: '/usr/bin/mysql -h localhost -u root -e "show databases;" || exit 1'
+        healthcheck_interval: 10s
+
+    - include_role:
+        name: podman_systemd_container
+      vars:
+        container_name: dbservice-pma
+        image: phpmyadmin/phpmyadmin
+        description: phpMyAdmin service
+        network: container:dbservice-mariadb
+        env:
+          PMA_HOST: 127.0.0.1
+        healthcheck: 'curl http://localhost || exit 1'
+        healthcheck_interval: 10s

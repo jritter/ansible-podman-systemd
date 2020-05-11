@@ -1,0 +1,56 @@
+- name: Configure Database Service
+  hosts: all
+  tasks:
+    - name: start the database container
+      containers.podman.podman_container:
+        name: dbservice-mariadb
+        hostname: dbservice-mariadb
+        image: registry.redhat.io/rhel8/mariadb-103
+        state: started
+        pod: 'new:dbservice'
+        env:
+          MYSQL_USER: user
+          MYSQL_PASSWORD: pass
+          MYSQL_DATABASE: db
+        volume:
+          - /var/dbservice/db:/var/lib/mysql/data:Z
+        ports:
+          - '8080:80'
+          - '3306:3306'
+        healthcheck: '/usr/bin/mysql -h localhost -u root -e "show databases;" || exit 1'
+        healthcheck_interval: 10s
+      register: dbservice_mariadb
+
+    - name: show dbservice-mariadb
+      debug:
+        var: dbservice_mariadb
+
+    - name: start the pma container
+      containers.podman.podman_container:
+        name: dbservice-pma
+        hostname: dbservice-pma
+        image: phpmyadmin/phpmyadmin
+        state: started
+        pod: 'dbservice'
+        env:
+          PMA_HOST: 127.0.0.1
+        healthcheck: '/usr/bin/curl http://localhost || exit 1'
+        healthcheck_interval: 10s
+      register: dbservice_pma
+
+    - name: show dbservice-pma
+      debug:
+        var: dbservice_pma
+
+    - name: get container info
+      containers.podman.podman_container_info:
+        name:
+          - dbservice-mariadb
+          - dbservice-pma
+      register: container_info
+      tags: container_info
+
+    - name: print debug
+      debug:
+        var: container_info
+      tags: container_info
