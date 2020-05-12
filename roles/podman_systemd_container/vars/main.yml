@@ -1,3 +1,0 @@
----
-# vars file for podman_systemd_container
-service_name: "{{ container_name }}-container-pod.service"
