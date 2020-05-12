@@ -8,5 +8,4 @@ ports: []
 install_podman: true
 container_run_as_user: root
 container_run_as_group: root
-unprivileged_port_start: true
-unprivileged_port_start_from: 80
+ip_unprivileged_port_start: 80
