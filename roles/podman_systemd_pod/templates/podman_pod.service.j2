@@ -1,0 +1,19 @@
+# Inspired by https://www.redhat.com/sysadmin/podman-shareable-systemd-services
+
+[Unit]
+Description={{ description }}
+After=network.target
+
+[Service]
+Restart=on-failure
+ExecStartPre=/usr/bin/sh -c "/usr/bin/podman pod stop {{ pod_name }} || true"
+ExecStartPre=/usr/bin/sh -c "/usr/bin/podman pod rm -f {{ pod_name }} || true"
+ExecStart=/usr/bin/podman play kube {{ pod_directory }}/{{ pod_name }}.yaml
+ExecStop=/usr/bin/sh -c "/usr/bin/podman pod rm -f {{ pod_name }}"
+KillMode=none
+Type=forking
+RemainAfterExit=yes
+
+
+[Install]
+WantedBy=multi-user.target

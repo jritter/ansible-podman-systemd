@@ -1,0 +1,138 @@
+# Generation of Kubernetes YAML is still under development!
+#
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-1.6.4
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: '2020-05-12T12:05:15Z'
+  labels:
+    app: {{ pod_name }}
+  name: {{ pod_name }}
+spec:
+  containers:
+    - command:
+        - apache2-foreground
+      env:
+        - name: PATH
+          value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        - name: TERM
+          value: xterm
+        - name: HOSTNAME
+          value: dbservice-pod-pma
+        - name: container
+          value: podman
+        - name: APACHE_CONFDIR
+          value: /etc/apache2
+        - name: APACHE_ENVVARS
+          value: /etc/apache2/envvars
+        - name: PHP_URL
+          value: https://www.php.net/get/php-7.4.5.tar.xz/from/this/mirror
+        - name: PHP_ASC_URL
+          value: https://www.php.net/get/php-7.4.5.tar.xz.asc/from/this/mirror
+        - name: PHP_INI_DIR
+          value: /usr/local/etc/php
+        - name: PHP_EXTRA_CONFIGURE_ARGS
+          value: --with-apxs2 --disable-cgi
+        - name: PHP_MD5
+        - name: VERSION
+          value: 5.0.2
+        - name: URL
+          value: https://files.phpmyadmin.net/phpMyAdmin/5.0.2/phpMyAdmin-5.0.2-all-languages.tar.xz
+        - name: PHPIZE_DEPS
+          value:
+            "autoconf \t\tdpkg-dev \t\tfile \t\tg++ \t\tgcc \t\tlibc-dev \t\tmake
+            \t\tpkg-config \t\tre2c"
+        - name: PHP_EXTRA_BUILD_DEPS
+          value: apache2-dev
+        - name: PHP_CFLAGS
+          value: -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+        - name: PHP_CPPFLAGS
+          value: -fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+        - name: GPG_KEYS
+          value: 42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312
+        - name: PMA_HOST
+          value: 127.0.0.1
+        - name: PHP_LDFLAGS
+          value: -Wl,-O1 -pie
+        - name: PHP_VERSION
+          value: 7.4.5
+        - name: PHP_SHA256
+          value: d059fd7f55bdc4d2eada15a00a2976697010d3631ef6f83149cc5289e1f23c2c
+      image: docker.io/phpmyadmin/phpmyadmin:latest
+      name: dbservice-pod-pma
+      ports:
+        - containerPort: 80
+          hostPort: 8090
+          protocol: TCP
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: true
+        capabilities: {}
+        privileged: false
+        readOnlyRootFilesystem: false
+      workingDir: /var/www/html
+    - command:
+        - run-mysqld
+      env:
+        - name: PATH
+          value: /opt/app-root/src/bin:/opt/app-root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        - name: TERM
+          value: xterm
+        - name: HOSTNAME
+          value: dbservice-pod-mariadb
+        - name: container
+          value: oci
+        - name: APP_DATA
+          value: /opt/app-root/src
+        - name: MYSQL_PREFIX
+          value: /usr
+        - name: DESCRIPTION
+          value:
+            MariaDB is a multi-user, multi-threaded SQL database server. The container
+            image provides a containerized packaging of the MariaDB mysqld daemon and
+            client application. The mysqld server daemon accepts connections from clients
+            and provides access to content from MariaDB databases on behalf of the clients.
+        - name: HOME
+          value: /var/lib/mysql
+        - name: MYSQL_VERSION
+          value: '10.3'
+        - name: MYSQL_PASSWORD
+          value: pass
+        - name: MYSQL_DATABASE
+          value: db
+        - name: STI_SCRIPTS_URL
+          value: image:///usr/libexec/s2i
+        - name: CONTAINER_SCRIPTS_PATH
+          value: /usr/share/container-scripts/mysql
+        - name: MYSQL_USER
+          value: user
+        - name: STI_SCRIPTS_PATH
+          value: /usr/libexec/s2i
+        - name: APP_ROOT
+          value: /opt/app-root
+        - name: PLATFORM
+          value: el8
+        - name: SUMMARY
+          value: MariaDB 10.3 SQL database server
+      image: registry.redhat.io/rhel8/mariadb-103:latest
+      name: dbservice-pod-mariadb
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: true
+        capabilities: {}
+        privileged: false
+        readOnlyRootFilesystem: false
+        runAsUser: 27
+      volumeMounts:
+        - mountPath: /var/lib/mysql/data:Z
+          name: var-dbservice-pod-db
+      workingDir: /opt/app-root/src
+  volumes:
+    - hostPath:
+        path: /var/dbservice-pod/db
+        type: Directory
+      name: var-dbservice-pod-db
+status: {}

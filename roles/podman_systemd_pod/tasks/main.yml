@@ -1,0 +1,26 @@
+---
+# tasks file for podman_systemd_pod
+
+- name: Ensure that {{ pod_directory }} exists
+  file:
+    path: '{{ pod_directory }}'
+    state: directory
+
+- name: Copy {{ pod_name }}.yaml to {{ pod_directory }}
+  template:
+    src: templates/{{ pod_name }}.yaml.j2
+    dest: '{{ pod_directory }}/{{ pod_name }}.yaml'
+
+- name: Install service file for {{ pod_name }} pod
+  template:
+    dest: '{{ service_files_dir }}/{{ service_name }}'
+    src: templates/podman_pod.service.j2
+  register: pod_service
+
+- name: make sure that {{ service_name }} is enabled and started
+  systemd:
+    daemon_reload: yes
+    name: '{{ service_name }}'
+    state: restarted
+    enabled: yes
+  when: pod_service.changed

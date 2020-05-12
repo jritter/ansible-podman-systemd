@@ -1,0 +1,6 @@
+---
+# defaults file for podman_prepare_host
+
+install_podman: true
+install_podman_docker: true
+ip_unprivileged_port_start: 80

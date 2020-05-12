@@ -3,6 +3,12 @@
   become: yes
   tasks:
     - include_role:
+        name: podman_prepare_host
+      vars:
+        install_podman: false
+        install_podman_docker: false
+
+    - include_role:
         name: podman_systemd_container
       vars:
         container_name: dbservice-mariadb
@@ -31,6 +37,3 @@
           PMA_HOST: 127.0.0.1
         healthcheck: 'curl http://localhost || exit 1'
         healthcheck_interval: 10s
-        install_podman: false
-        install_podman_docker: false
-        container_run_as_user: demouser ##dont forget to remove this one

@@ -1,0 +1,11 @@
+- name: Deploy dbservice
+  hosts: all
+  become: yes
+  tasks:
+    # Just a thought: Maybe we could load the kube yaml file and extract values there
+    # and use it to parametrize the deployment
+    - include_role:
+        name: podman_systemd_pod
+      vars:
+        pod_name: dbservice
+        description: DB Service Pod containing

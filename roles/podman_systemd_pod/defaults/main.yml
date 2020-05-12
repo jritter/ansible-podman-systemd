@@ -1,0 +1,8 @@
+---
+# defaults file for podman_systemd_pod
+
+pod_directory: /etc/containers/pods
+service_files_dir: /etc/systemd/system
+service_name: '{{ pod_name }}-pod.service'
+systemd_RestartSec: 30
+systemd_TimeoutStartSec: 15
