@@ -6,6 +6,7 @@ Description={{ description }}
 [Service]
 Restart=on-failure
 ExecStartPre=/usr/bin/rm -f %t/%n-pid %t/%n-cid
+ExecStartPre=/bin/sh -c '/usr/bin/podman rm -f {{ container_name }} || exit 0'
 ExecStart=/usr/bin/podman run --name {{ container_name }} \
     --hostname {{ container_name }} \
     {% if network is defined %}--network {{ network }} \
@@ -15,6 +16,7 @@ ExecStart=/usr/bin/podman run --name {{ container_name }} \
     -d \
     {% for var, val in env.items() %} -e {{ var }}={{ val }}{% endfor %} \
     {% for port in ports %} -p {{ port }}{% endfor %} \
+    {% for vol in volumes %} -v {{ vol }}{% endfor %} \
     {% if healthcheck is defined %}--health-cmd='{{ healthcheck }}' \
     --health-interval={{ health_interval }} \
     --health-retries={{ health_retries }} \

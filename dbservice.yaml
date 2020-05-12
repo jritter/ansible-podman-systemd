@@ -15,7 +15,7 @@
         ports:
           - '3306:3306'
           - '8080:80'
-        volume:
+        volumes:
           - /var/dbservice/db:/var/lib/mysql/data:Z
         healthcheck: '/usr/bin/mysql -h localhost -u root -e "show databases;" || exit 1'
         healthcheck_interval: 10s
@@ -33,4 +33,4 @@
         healthcheck_interval: 10s
         install_podman: false
         install_podman_docker: false
-        container_run_as_user: demouser ##dont forget to remove this one 
+        container_run_as_user: demouser ##dont forget to remove this one

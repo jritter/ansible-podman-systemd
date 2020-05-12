@@ -12,7 +12,9 @@ install_podman: true
 install_podman_docker: true
 ip_unprivileged_port_start: 80
 ports: []
+volumes: []
+
 service_files_dir: /etc/systemd/system
-service_name: "{{ container_name }}-container-pod.service"
+service_name: '{{ container_name }}-container-pod.service'
 systemd_RestartSec: 30
 systemd_TimeoutStartSec: 15
