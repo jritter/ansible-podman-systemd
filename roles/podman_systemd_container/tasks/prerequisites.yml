@@ -4,13 +4,14 @@
 - import_tasks: podman.yml
   when: install_podman
 
-- name: Allow users to expose services below 1024
-  sysctl:
-    name: net.ipv4.ip_unprivileged_port_start
-    value: '{{ ip_unprivileged_port_start }}'
-    sysctl_set: yes
-    state: present
-    reload: yes
-  when:
-    - ip_unprivileged_port_start is defined
-    - ip_unprivileged_port_start|length > 0
+- import_tasks: rootless_user.yml
+
+# - name: Allow users to expose services below 1024
+#   sysctl:
+#     name: net.ipv4.ip_unprivileged_port_start
+#     value: '{{ ip_unprivileged_port_start }}'
+#     sysctl_set: yes
+#     state: present
+#     reload: yes
+#   when:
+#     - ip_unprivileged_port_start is defined
