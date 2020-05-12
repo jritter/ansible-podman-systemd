@@ -15,7 +15,7 @@
         ports:
           - '3306:3306'
           - '8080:80'
-        volume:
+        volumes:
           - /var/dbservice/db:/var/lib/mysql/data:Z
         healthcheck: '/usr/bin/mysql -h localhost -u root -e "show databases;" || exit 1'
         healthcheck_interval: 10s
