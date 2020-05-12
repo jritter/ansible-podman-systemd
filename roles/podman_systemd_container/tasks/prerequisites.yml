@@ -1,0 +1,12 @@
+---
+# tasks file for podman_systemd_container
+
+- import_tasks: podman.yml
+  when: install_podman
+
+- name: Allow users to expose services below 1024
+  replace:
+    path: /proc/sys/net/ipv4/ip_unprivileged_port_start
+    regexp: '.*'
+    replace: "{{ unprivileged_port_start_from }}"
+  when: unprivileged_port_start

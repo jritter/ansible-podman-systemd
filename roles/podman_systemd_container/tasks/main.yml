@@ -1,6 +1,8 @@
 ---
 # tasks file for podman_systemd_container
 
+- import_tasks: prerequisites.yml
+
 - name: Install service file for {{ container_name }} container
   template:
     dest: /etc/systemd/system/{{ container_name }}.service

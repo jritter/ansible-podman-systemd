@@ -1,0 +1,49 @@
+---
+# tasks file for podman_systemd_container
+
+- name: Ensure podman is installed
+  package:
+    name: podman
+    state: installed
+  
+- name: Check if user exists
+  user:
+    name: "{{ container_run_as_user }}"
+
+- name: Check if user exists in subuid file
+  lineinfile:
+    path: /etc/subuid
+    regexp: "^{{ container_run_as_user }}:.*"
+  check_mode: yes
+  register: uid_has
+  ignore_errors: true
+
+- name: Check if group exists in subgid file
+  lineinfile:
+    path: /etc/subgid
+    regexp: "^{{ container_run_as_group }}:.*"
+  check_mode: yes
+  register: gid_has
+  ignore_errors: true
+
+- name: Ensure user exists in subuid file, if it was missing
+  lineinfile:
+    path: /etc/subuid
+    regexp: "^{{ container_run_as_user }}:.*"
+    line: "{{ container_run_as_user }}:305536:65536"
+    create: yes
+    mode: '0644'
+    owner: root
+    group: root
+  when: uid_has.changed and container_run_as_user != 'root'
+
+- name: Ensure group is in subgid file, if it was missing
+  lineinfile:
+    path: /etc/subgid
+    regexp: "^{{ container_run_as_group }}:.*"
+    line: "{{ container_run_as_group }}:305536:65536"
+    create: yes
+    mode: '0644'
+    owner: root
+    group: root
+  when: gid_has.changed and container_run_as_user != 'root'

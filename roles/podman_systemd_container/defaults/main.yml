@@ -5,3 +5,8 @@ health_retries: 3
 health_start_period: 0s
 health_timeout: 30s
 ports: []
+install_podman: true
+container_run_as_user: root
+container_run_as_group: root
+unprivileged_port_start: true
+unprivileged_port_start_from: 80
