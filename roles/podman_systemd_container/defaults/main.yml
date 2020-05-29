@@ -1,18 +1,14 @@
 ---
 # defaults file for podman_systemd_container
 container_restart: on-failure
-container_run_as_group: root
-container_run_as_user: root
-container_stop_timeout: 15
 health_interval: 30s
 health_retries: 3
 health_start_period: 0s
 health_timeout: 30s
-
 ports: []
 volumes: []
-
+env: {}
 service_files_dir: /etc/systemd/system
-service_name: '{{ container_name }}-container.service'
+service_name: '{{ container_name }}.service'
 systemd_RestartSec: 30
 systemd_TimeoutStartSec: 15

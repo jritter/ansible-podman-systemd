@@ -32,7 +32,7 @@ sudo sh -c 'echo 80 > /proc/sys/net/ipv4/ip_unprivileged_port_start'
 
 ## Ansible
 
-Install the follwing roles as dependency
+Install the following roles as dependency
 
 ```shell
 ansible-galaxy collection install -r requirements.yml
@@ -41,5 +41,5 @@ ansible-galaxy collection install -r requirements.yml
 # Using the role
 
 ```shell
-ansible-playbook -i hosts.ini dbservice.yaml
+ansible-playbook -i hosts.ini dbservice_container.yaml
 ```
