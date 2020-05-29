@@ -1,28 +1,43 @@
-# Inspired by https://www.redhat.com/sysadmin/podman-shareable-systemd-services
+# Inspired by 
+# - https://www.redhat.com/sysadmin/podman-shareable-systemd-services
+# - https://fedoramagazine.org/systemd-unit-dependencies-and-order/
 
 [Unit]
 Description={{ description }}
+{% if depends_on is defined -%}
+After={{ depends_on }}.service
+Requires={{ depends_on }}.service
+{% endif %}
 
 [Service]
-Restart=on-failure
+Restart={{ container_restart }}
 ExecStartPre=/usr/bin/rm -f %t/%n-pid %t/%n-cid
 ExecStartPre=/bin/sh -c '/usr/bin/podman rm -f {{ container_name }} || exit 0'
-ExecStart=/usr/bin/podman run --name {{ container_name }} \
+ExecStart=/usr/bin/podman run \
+    --name {{ container_name }} \
     --hostname {{ container_name }} \
-    {% if network is defined %}--network {{ network }} \
-    {% endif %}
+{% if network is defined %}
+    --network {{ network }} \
+{% endif %}
     --conmon-pidfile %t/%n-pid \
     --cidfile %t/%n-cid \
     -d \
-    {% for var, val in env.items() %} -e {{ var }}={{ val }}{% endfor %} \
-    {% for port in ports %} -p {{ port }}{% endfor %} \
-    {% for vol in volumes %} -v {{ vol }}{% endfor %} \
-    {% if healthcheck is defined %}--health-cmd='{{ healthcheck }}' \
+{% if env | length > 0 %}
+    {% for var, val in env.items() %}-e {{ var }}={{ val }} {% endfor %}\
+{% endif %}
+{% if ports | length > 0 %}
+    {% for port in ports -%}-p {{ port }} {% endfor %}\
+{% endif %}
+{% if volumes | length > 0 %}
+    {% for vol in volumes -%}-v {{ vol }} {% endfor %}\
+{% endif %}
+{% if healthcheck is defined %}
+    --health-cmd='{{ healthcheck }}' \
     --health-interval={{ health_interval }} \
     --health-retries={{ health_retries }} \
     --health-start-period={{ health_start_period }} \
     --health-timeout={{ health_timeout }} \
-    {% endif %}
+{% endif %}
     {{ image }}
 ExecStop=/usr/bin/sh -c "/usr/bin/podman rm -f `cat %t/%n-cid`"
 KillMode=none
